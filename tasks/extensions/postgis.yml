@@ -9,6 +9,20 @@
   with_items:
     - libgeos-c1
     - "postgresql-{{postgresql_version}}-postgis-{{postgresql_ext_postgis_version}}"
-    - "postgresql-{{postgresql_version}}-postgis-scripts"
+    - "postgresql-{{postgresql_version}}-postgis-{{postgresql_ext_postgis_version}}-scripts"
+  when: ansible_os_family == "Debian"
+  notify:
+    - restart postgresql
+
+- name: PostgreSQL | Extensions | Make sure the postgis extensions are installed
+  yum:
+    name: "{{item}}"
+    state: present
+  with_items:
+    - postgis2_{{postgresql_version | replace('.','') }}
+    - postgis2_{{postgresql_version | replace('.','') }}-client
+    - postgis2_{{postgresql_version | replace('.','') }}-utils
+    - ogr_fdw95
+  when: ansible_os_family == "RedHat"
   notify:
     - restart postgresql
